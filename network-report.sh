@@ -3,7 +3,7 @@
 # Display usage information if -h or --help is provided
 if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     echo "Usage: $0 [output_file]"
-    echo "Scans for mDNS services and generates an HTML report"
+    echo "Scans for network devices and services then generates an HTML report"
     echo ""
     echo "Arguments:"
     echo "  output_file    Optional: Path to save the HTML report (default: ./network-report.html)"
@@ -30,9 +30,15 @@ fi
 
 # Check if avahi-browse is installed
 if ! command -v avahi-browse &> /dev/null; then
-    echo "Error: avahi-browse is not installed. Please install avahi-utils package."
+    echo "Error: avahi-browse commandis not installed. Please install avahi-utils package."
     echo "On Debian/Ubuntu: sudo apt-get install avahi-utils"
-    echo "On RHEL/CentOS: sudo yum install avahi-tools"
+    exit 1
+fi
+
+# Check if arp is installed
+if ! command -v arp &> /dev/null; then
+    echo "Error: arp command is not installed. Please install net-tools package."
+    echo "On Debian/Ubuntu: sudo apt-get install net-tools"
     exit 1
 fi
 

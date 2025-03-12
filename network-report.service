@@ -1,10 +1,10 @@
 [Unit]
-Description=mDNS Network Service Scanner
+Description=Network Service Report
 After=network.target avahi-daemon.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /usr/local/bin/network-report.sh /var/www/html/mdns/mdns_services.html
+ExecStart=/bin/bash /usr/local/bin/network-report.sh /var/www/html/reports/network-report.html
 User=nobody
 Group=nogroup
 
