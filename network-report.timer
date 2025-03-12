@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Network Report every 15 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Unit=network-report.service
+
+[Install]
+WantedBy=timers.target 
