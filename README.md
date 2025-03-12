@@ -1,20 +1,24 @@
-# Network Service Discovery Reporter
+# Network Device and Service Report
 
-A tool that combines mDNS/Bonjour service discovery with ARP information to create a comprehensive HTML report of network services and devices. The report includes service names, hostnames, IP addresses, MAC addresses, and additional service information.
+A tool that combines mDNS/Bonjour service discovery with ARP information to create a basic HTML report of network services and devices. The report includes service names, hostnames, IP addresses, MAC addresses, and additional service information.
+
+I originally wrote this because sometimes, just sometimes, I would be connected remotely via VPN or something, and the service I'm trying to use just isn't working. I run this report periodically and place it on a webserver that's only accessible from inside the LAN. That way, if all else fails, I always have one more place I can look up a hostname, IP address, or service name of something in my LAN.
+
+I absolutely do not recommend running this on a machine that's directly accessible via the internet. It's not information you want everyone everywhere to look at.
+
 
 ## Features
 
 - Discovers mDNS/Bonjour services on your network
 - Includes ARP table information (IP and MAC addresses)
-- Generates a clean, well-formatted HTML report
-- Color-coded entries (green for mDNS services, blue for ARP-only entries)
-- Case-insensitive sorting by hostname
+- Pops it all into a table in an HTML report, sorted by hostname
 - Automatic report generation via systemd timer
-- Converts escaped characters in service names to readable text
+- Converts backslash-escaped characters in service names to readable text
 
 ## Prerequisites
 
 - Linux system with systemd
+- `net-tools` package installed (this comes with most linux distros)
 - `avahi-utils` package installed
 - Write permissions for the output directory
 
@@ -24,9 +28,7 @@ A tool that combines mDNS/Bonjour service discovery with ARP information to crea
    ```bash
    # For Debian/Ubuntu
    sudo apt-get install avahi-utils
-
-   # For RHEL/CentOS
-   sudo yum install avahi-tools
+   sudo apt-get install net-tools
    ```
 
 2. Copy the script and service files:
@@ -37,10 +39,10 @@ A tool that combines mDNS/Bonjour service discovery with ARP information to crea
    sudo cp network-report.timer /etc/systemd/system/
    ```
 
-3. Create output directory (if using default service configuration):
+3. Create output directory:
    ```bash
-   sudo mkdir -p /var/www/html/mdns
-   sudo chown nobody:nogroup /var/www/html/mdns
+   sudo mkdir -p /var/www/html/reports
+   sudo chown nobody:nogroup /var/www/html/reports
    ```
 
 4. Enable and start the timer for automatic updates:
@@ -55,14 +57,14 @@ A tool that combines mDNS/Bonjour service discovery with ARP information to crea
 You can run the script manually with or without specifying an output file:
 
 ```bash
-# Use default output (./network-report.html in current directory)
-./network-report.sh
+# Use default output (network-report.html in current directory)
+network-report.sh
 
 # Specify custom output file
-./network-report.sh /path/to/output.html
+network-report.sh /path/to/output.html
 
 # Show help
-./network-report.sh --help
+network-report.sh --help
 ```
 
 ## Service Configuration
@@ -70,40 +72,13 @@ You can run the script manually with or without specifying an output file:
 The systemd service is configured to:
 - Run every 15 minutes
 - Start 5 minutes after boot
-- Run as the `nobody` user for security
-- Save reports to `/var/www/html/mdns/mdns_services.html` by default
-
-To modify the schedule, edit `/etc/systemd/system/network-report.timer` and run:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart network-report.timer
-```
-
-## Troubleshooting
-
-1. Check if avahi-daemon is running:
-   ```bash
-   systemctl status avahi-daemon
-   ```
-
-2. Verify timer status:
-   ```bash
-   systemctl status network-report.timer
-   ```
-
-3. View recent service logs:
-   ```bash
-   journalctl -u network-report.service -n 50
-   ```
-
-4. Common issues:
-   - Empty report: No mDNS services found or avahi-daemon not running
-   - Permission denied: Check output directory permissions
-   - Service not found: Ensure avahi-utils is installed
+- Run as the `nobody` user
+- Save reports to `/var/www/html/reports/network-report.html`
 
 ## Output Format
 
 The HTML report includes:
+
 - Service type and interface
 - Protocol information
 - Service name and type
@@ -114,4 +89,4 @@ The HTML report includes:
 
 ## License
 
-This project is open source and available under the MIT License. 
+This project is open source and available under the MIT License.
